@@ -142,15 +142,11 @@ Activate copilot in RStudio
 
 3. Click the Sign In button. Follow the steps to authenticate with GitHub. Once done, click OK to close the Global Options dialog
 
-Alternatives
-
-- Use your favorite AI (e.g. ChatGPT, Gemini, etc) on the browser
-
-- Use your favorite editor. Visual Studio Code is nice
+Alternatively, use your favorite AI (e.g. ChatGPT, Gemini, etc) on the browser
 
 
 
-## Example
+## Copilot example
 
 Create a new R script (File -> New file -> R script)
 
@@ -199,6 +195,18 @@ ggplot(mtcars, aes(x = hp, y = mpg)) +
 ```
 
 :::
+
+
+## An alternative editor
+
+[Visual Studio Code](https://code.visualstudio.com) is a free, open-source, multi-language code editor
+
+- Great integration with AEI tools, including GitHub copilot
+
+- Great for advanced debugging, version control, R packages using C++
+
+Setup instructions for
+[R in Visual Studio Code](https://code.visualstudio.com/docs/languages/r)
 
 
 # First examples
