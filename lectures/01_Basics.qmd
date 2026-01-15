@@ -20,12 +20,14 @@ cache: false
 bibliography: references.bib
 ---
 
-## Reproducing these lecture notes
+# Lecture notes
 
-Source code: `01_Basics.qmd` (quarto markdown) at https://github.com/davidrusi/statcomp
+##
+
+Source code: `01_Basics.qmd` (quarto markdown) at [https://github.com/davidrusi/statcomp](https://github.com/davidrusi/statcomp)
 
 I recommend [GitHub Desktop](https://desktop.github.com) to pull the latest changes.
-See the README on how to sync your local changes with the repository
+See the [README](https://github.com/davidrusi/statcomp) on how to sync your local changes with the repository
 
 
 Required R packages
@@ -83,9 +85,9 @@ A road map
 
 - Computationally-intensive methods for inference (to relax assumptions)
 
-- Reproducible & interactive reports
+- Foundations of machine learning
 
-- Bits of cool topics in data science & machine learning
+- Interactive reports
 
 
 ## Resources
@@ -142,9 +144,9 @@ Activate copilot in RStudio
 
 1. Go to Tools -> Global Options...
 
-2. In the left menu, click "Copilot". Then "Enable GitHub Copilot"
+2. In the left menu, click `Copilot`. Then `Enable GitHub Copilot`
 
-3. Click the Sign In button. Follow the steps to authenticate with GitHub. Once done, click OK to close the Global Options dialog
+3. Click the `Sign In` button. Follow the steps to authenticate with GitHub. Once done, click OK to close the Global Options dialog
 
 Alternatively, use your favorite AI (e.g. ChatGPT, Gemini, etc) on the browser
 
@@ -205,7 +207,7 @@ ggplot(mtcars, aes(x = hp, y = mpg)) +
 
 [Visual Studio Code](https://code.visualstudio.com) is a free, open-source, multi-language code editor
 
-- Great integration with AEI tools, including GitHub copilot
+- Great integration with AI tools, including GitHub copilot
 
 - Great for advanced debugging, version control, R packages using C++
 

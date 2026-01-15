@@ -201,7 +201,9 @@ ggplot(starwars, aes(x = height, y = mass, color=human_skincolor)) +
 
 `labs` sets title and labels of axis and aesthetics (e.g. `color`, `shape`, `linetype`)
 
-We need to set all aesthetic labels, else a separate legend is created for each
+- Set all aesthetic labels, else a separate legend is created for each
+
+- Increase text size and move legend position
 
 ```{r}
 mylab= 'Human character?'
@@ -209,7 +211,7 @@ ggplot(data = starwars, aes(x = height, y = mass, color=human_skincolor)) +
   geom_point(aes(shape=human_skincolor)) +
   geom_smooth(aes(linetype= human_skincolor), method='lm', se=TRUE) +
   labs(x='Height(cm)', y='Mass (kg)', title='Starwars characters', color=mylab, shape=mylab, linetype=mylab) +
-  theme(legend.position = c(0.1,0.7))
+  theme(legend.position = c(0.2,0.8), text = element_text(size = 20))
 ```
 
 ## Customizing labels and legends
@@ -254,7 +256,7 @@ Dataset `hate_crimes` (package `fivethirtyeight`) has this info for each state:
 
 - `hate_crimes_per_100k_splc`: post-election crimes in 10-day period from SPLC (southern poverty law center)
 
-- education (% adults $\geq$ 25 with high school degree
+- education (% adults $\geq$ 25 with high school degree)
 
 - % of people who voted Donald Trump
 
@@ -334,7 +336,9 @@ ggplot(starwars, aes(x=height, color=human_skincolor)) +
 ### Density plot
 ```{r}
 ggplot(starwars, aes(x=height, color=human_skincolor)) +
-  geom_density()  
+  geom_density() +
+  theme(legend.position= c(0.8,0.8)) +
+  labs(color = "Skin color", x= "Height (cm)", y="Density")
 ```
 
 :::
@@ -348,7 +352,6 @@ ggplot(starwars, aes(x=height, color=human_skincolor)) +
 
 ```{r swviolin}
 ggplot(starwars, aes(x=human_skincolor, y=height)) +
-  geom_point() +
   geom_violin()
 ```
 
@@ -360,8 +363,10 @@ boxplot(height ~ human_skincolor, data=starwars, names=c('No','Yes'), xlab='Huma
 
 ### Scatterplot
 
-```{r scatter}
+
+```{r}
 ggplot(starwars, aes(x=human_skincolor, y=height)) +
+  geom_violin(quantile.linetype= "solid", quantile.color = "gray") +
   geom_point()
 ```
 
@@ -459,7 +464,8 @@ mylab= 'Delivery method'
 ggplot(data=df, aes(x=dose, y=len, group=supp, color=supp)) +
   geom_line()+
   geom_point() +
-  labs(x='Dose', y='Teeth length (mm)', group=mylab, color=mylab)
+  labs(x='Dose', y='Teeth length (mm)', group=mylab, color=mylab) +
+  theme(legend.position= c(0.2,0.8))
 ```
 
 # Saving a ggplot
@@ -686,7 +692,7 @@ Sometimes a non-animated figure is more effective
 ```{r}
 p= ggplot(gapminder, aes(x=factor(year), y=gdpPercap)) +
   geom_point() +
-  geom_violin() +
+  geom_violin(quantile.linetype = "solid", quantile.color = "gray") +
   labs(x="Year", y="GDP per capita")
 p
 ```

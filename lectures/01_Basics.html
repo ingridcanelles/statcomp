@@ -212,16 +212,22 @@ David Rossell
 <nav role="doc-toc"> 
 <h2 id="toc-title">Table of contents</h2>
 <ul>
+<li><a href="#/lecture-notes" id="/toc-lecture-notes">Lecture notes</a></li>
 <li><a href="#/why-statistical-computing" id="/toc-why-statistical-computing">Why Statistical Computing?</a></li>
 <li><a href="#/first-examples" id="/toc-first-examples">First examples</a></li>
 <li><a href="#/r-basics" id="/toc-r-basics">R basics</a></li>
 </ul>
 </nav>
 </section>
-<section id="reproducing-these-lecture-notes" class="slide level2">
-<h2>Reproducing these lecture notes</h2>
-<p>Source code: <code>01_Basics.qmd</code> (quarto markdown) at https://github.com/davidrusi/statcomp</p>
-<p>I recommend <a href="https://desktop.github.com">GitHub Desktop</a> to pull the latest changes. See the README on how to sync your local changes with the repository</p>
+<section>
+<section id="lecture-notes" class="title-slide slide level1 center">
+<h1>Lecture notes</h1>
+
+</section>
+<section id="section" class="slide level2">
+<h2></h2>
+<p>Source code: <code>01_Basics.qmd</code> (quarto markdown) at <a href="https://github.com/davidrusi/statcomp">https://github.com/davidrusi/statcomp</a></p>
+<p>I recommend <a href="https://desktop.github.com">GitHub Desktop</a> to pull the latest changes. See the <a href="https://github.com/davidrusi/statcomp">README</a> on how to sync your local changes with the repository</p>
 <p>Required R packages</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"dplyr"</span>)</span>
@@ -238,7 +244,7 @@ David Rossell
 <span id="cb2-3"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb2-4"><a href="" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dsbox)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
+</section></section>
 <section>
 <section id="why-statistical-computing" class="title-slide slide level1 center">
 <h1>Why Statistical Computing?</h1>
@@ -268,8 +274,8 @@ David Rossell
 <li><p>Data visualization &amp; manipulation</p></li>
 <li><p>Models for continuous/binary/count data, interpretation, model-checking</p></li>
 <li><p>Computationally-intensive methods for inference (to relax assumptions)</p></li>
-<li><p>Reproducible &amp; interactive reports</p></li>
-<li><p>Bits of cool topics in data science &amp; machine learning</p></li>
+<li><p>Foundations of machine learning</p></li>
+<li><p>Interactive reports</p></li>
 </ul>
 </section>
 <section id="resources" class="slide level2">
@@ -314,8 +320,8 @@ David Rossell
 <p>Activate copilot in RStudio</p>
 <ol type="1">
 <li><p>Go to Tools -&gt; Global Options…</p></li>
-<li><p>In the left menu, click “Copilot”. Then “Enable GitHub Copilot”</p></li>
-<li><p>Click the Sign In button. Follow the steps to authenticate with GitHub. Once done, click OK to close the Global Options dialog</p></li>
+<li><p>In the left menu, click <code>Copilot</code>. Then <code>Enable GitHub Copilot</code></p></li>
+<li><p>Click the <code>Sign In</code> button. Follow the steps to authenticate with GitHub. Once done, click OK to close the Global Options dialog</p></li>
 </ol>
 <p>Alternatively, use your favorite AI (e.g.&nbsp;ChatGPT, Gemini, etc) on the browser</p>
 </section>
@@ -363,7 +369,7 @@ David Rossell
 <h2>An alternative editor</h2>
 <p><a href="https://code.visualstudio.com">Visual Studio Code</a> is a free, open-source, multi-language code editor</p>
 <ul>
-<li><p>Great integration with AEI tools, including GitHub copilot</p></li>
+<li><p>Great integration with AI tools, including GitHub copilot</p></li>
 <li><p>Great for advanced debugging, version control, R packages using C++</p></li>
 </ul>
 <p>Setup instructions for <a href="https://code.visualstudio.com/docs/languages/r">R in Visual Studio Code</a></p>
@@ -373,7 +379,7 @@ David Rossell
 <h1>First examples</h1>
 
 </section>
-<section id="section" class="slide level2">
+<section id="section-1" class="slide level2">
 <h2></h2>
 <blockquote>
 <p>“The simple graph has brought more information to the data analyst’s mind than any other device” - John Tukey</p>
@@ -402,7 +408,7 @@ David Rossell
 </div>
 <p><small> Note: <code>tibble</code> is an extension of <code>data.frame</code>, to be discussed </small></p>
 </section>
-<section id="section-1" class="slide level2">
+<section id="section-2" class="slide level2">
 <h2></h2>
 <p>Scatterplots help reveal trends, and <strong>outliers</strong></p>
 <div class="cell">
@@ -411,7 +417,7 @@ David Rossell
 
 </div>
 <img data-src="01_Basics_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
-<section id="section-2" class="slide level2">
+<section id="section-3" class="slide level2">
 <h2></h2>
 <p>Same figure, now using <code>ggplot</code> (to be discussed)</p>
 <div class="cell">
