@@ -909,7 +909,7 @@ hs                      0.164      -0.127 -0.583  1.000</code></pre>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="" aria-hidden="true" tabindex="-1"></a>p<span class="ot">=</span> <span class="fu">ggplot</span>(gapminder, <span class="fu">aes</span>(<span class="at">x=</span><span class="fu">factor</span>(year), <span class="at">y=</span>gdpPercap)) <span class="sc">+</span></span>
 <span id="cb52-2"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb52-3"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>() <span class="sc">+</span></span>
+<span id="cb52-3"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>(<span class="at">quantile.linetype =</span> <span class="st">"solid"</span>, <span class="at">quantile.color =</span> <span class="st">"gray"</span>) <span class="sc">+</span></span>
 <span id="cb52-4"><a href="" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">"Year"</span>, <span class="at">y=</span><span class="st">"GDP per capita"</span>)</span>
 <span id="cb52-5"><a href="" aria-hidden="true" tabindex="-1"></a>p</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 

@@ -692,7 +692,7 @@ Sometimes a non-animated figure is more effective
 ```{r}
 p= ggplot(gapminder, aes(x=factor(year), y=gdpPercap)) +
   geom_point() +
-  geom_violin() +
+  geom_violin(quantile.linetype = "solid", quantile.color = "gray") +
   labs(x="Year", y="GDP per capita")
 p
 ```
