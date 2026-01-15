@@ -336,7 +336,9 @@ ggplot(starwars, aes(x=height, color=human_skincolor)) +
 ### Density plot
 ```{r}
 ggplot(starwars, aes(x=height, color=human_skincolor)) +
-  geom_density()  
+  geom_density() +
+  theme(legend.position= c(0.8,0.8)) +
+  labs(color = "Skin color", x= "Height (cm)", y="Density")
 ```
 
 :::
@@ -350,7 +352,6 @@ ggplot(starwars, aes(x=height, color=human_skincolor)) +
 
 ```{r swviolin}
 ggplot(starwars, aes(x=human_skincolor, y=height)) +
-  geom_point() +
   geom_violin()
 ```
 
@@ -362,8 +363,10 @@ boxplot(height ~ human_skincolor, data=starwars, names=c('No','Yes'), xlab='Huma
 
 ### Scatterplot
 
-```{r scatter}
+
+```{r}
 ggplot(starwars, aes(x=human_skincolor, y=height)) +
+  geom_violin(quantile.linetype= "solid", quantile.color = "gray") +
   geom_point()
 ```
 
@@ -461,7 +464,8 @@ mylab= 'Delivery method'
 ggplot(data=df, aes(x=dose, y=len, group=supp, color=supp)) +
   geom_line()+
   geom_point() +
-  labs(x='Dose', y='Teeth length (mm)', group=mylab, color=mylab)
+  labs(x='Dose', y='Teeth length (mm)', group=mylab, color=mylab) +
+  theme(legend.position= c(0.2,0.8))
 ```
 
 # Saving a ggplot
