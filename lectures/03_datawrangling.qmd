@@ -26,10 +26,10 @@ bibliography: references.bib
 Load the required R packages.
 
 ```{r, warning=FALSE}
-library(tidyverse)
-library(gapminder)
-library(Lahman)
-library(nycflights13)
+library(tidyverse)    # also loads package dplyr
+library(gapminder)    # data for examples
+library(Lahman)       # data for examples
+library(nycflights13) # data for examples
 ```
 
 
@@ -102,7 +102,7 @@ class(flights)
 ```{r}
 flightsdf= as.data.frame(flights)
 class(flightsdf)
-filter(flights, month == 1 & day == 1)
+filter(flightsdf, month == 1 & day == 1)
 ```
 
 ### matrix
@@ -198,12 +198,25 @@ select(flights, contains("delay"))
 
 ---
 
-Trick to put some columns at the start. Select them, then use `everything`
+Trick to put some columns at the start. 
+
+:::panel-tabset
+
+### select
+
+Select them, then use `everything`
 
 ```{r}
 select(flights, time_hour, air_time, everything())
 ```
 
+### relocate
+
+```{r}
+relocate(flights, time_hour, air_time) # .before & .after arguments to place other columns before/after
+```
+
+:::
 
 ## Rename
 
@@ -299,12 +312,11 @@ Flight distance vs. delay, for each destination airport with >20 flights other t
 ### R code
 
 ```{r}
-by_dest= group_by(flights, dest)
-delay= summarise(by_dest, count = n(),
-  dist = mean(distance, na.rm = TRUE),
-  delay = mean(arr_delay, na.rm = TRUE)
-)
-delay= filter(delay, count > 20, dest != "HNL") #>20 flights, remove Hololulu
+delay= group_by(flights, dest) |> 
+  summarise(count = n(),
+            dist = mean(distance, na.rm = TRUE),
+            delay = mean(arr_delay, na.rm = TRUE)) |> 
+  filter(count > 20, dest != "HNL")
 delay
 ```
 
@@ -318,19 +330,6 @@ ggplot(data = delay, mapping = aes(x = dist, y = delay)) +
 
 :::
 
-## Same using pipes
-
-Avoid creating intermediate datasets (`by_dest` in the previous slide)
-
-```{r}
-delays= group_by(flights, dest) |> 
-  summarise(count = n(),
-    dist = mean(distance, na.rm = TRUE),
-    delay = mean(arr_delay, na.rm = TRUE)
-  ) |> 
-  filter(count > 20, dest != "HNL")
-delays
-```
 
 ## Useful summaries
 
@@ -371,8 +370,8 @@ Cancelled flights have NA departure/arrival delays. Select non-cancelled flights
 ::: {.column width="70%"}
 
 ```{r}
-not_cancelled= filter(flights, !is.na(dep_delay), !is.na(arr_delay))
-delays= group_by(not_cancelled, tailnum) |>
+delays= filter(flights, !is.na(dep_delay), !is.na(arr_delay)) |>
+  group_by(tailnum) |>
   summarise(count= n(), delay = mean(arr_delay))
 
 ggplot(data = delays, mapping = aes(x = delay)) + 
@@ -397,7 +396,9 @@ The mean delay is actually pretty constant
 ```{r}
 ggplot(delays, aes(x=count, y=delay)) +
   geom_point() +
-  geom_smooth()
+  geom_smooth() +
+  labs(x='Number of flights', y='Mean arrival delay') +
+  theme(text = element_text(size=16))
 ```
 
 ## Batting averages
@@ -424,7 +425,8 @@ Batting average's mean & variance associated with opportunities to hit. Can you 
   ggplot(mapping = aes(x = ab, y = ba)) +
     geom_point() + 
     geom_smooth(se = FALSE) +
-    labs(x='Opportunities to hit', y='Batting average')
+    labs(x='Opportunities to hit', y='Batting average') +
+    theme(text = element_text(size=16))
 ```
 
 ## Counts
@@ -494,18 +496,13 @@ ggplot(diamonds, mapping = aes(x = carat, y = price)) +
 
 ---
 
-To do Exercises 1-2 below load the gapminder data
+Turn in a single html with your solutions at Aula Global.
+Name your file firstname_lastname.html.
 
 ```{r, eval=FALSE}
-library(gapminder)
+library(gapminder) # load the gapminder data
 gapminder
 ```
-
-Turn in a single html with your solutions at Aula Global
-Name your file firstname_lastname.html
-
-
-## Exercises
 
 **Exercise 1.** Continent-wide life expectancy
 
