@@ -1,0 +1,79 @@
+---
+title: "Exercise_5"
+Subtitle: "Ingrid Canelles Campas"
+output: html_document
+date: "2026-01-25"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#Load libraries
+library(tidyverse)
+library(fivethirtyeight)
+
+#Load routines
+source("code/routines.R")
+
+#Select and rename the needed variables, and remove Hawaii 
+hc= transmute(hate_crimes, state=state_abbrev, hatecrimes_fbi=avg_hatecrimes_per_100k_fbi, votes_trump=share_vote_trump, gini=gini_index, hs=share_pop_hs)
+hc= filter(hc, !is.na(hatecrimes_fbi)) #outcome must be non-missing
+```
+
+## 1. Fit a linear regression for hatecrimes_fbi vs. votes_trump, gini, hs. Report the point estimate, 95% intervals and P-values for the 3 covariates. Which of them are significantly associated to hate crimes?
+
+```{r}
+#Fitting the linear regression
+model= lm(hatecrimes_fbi ~ votes_trump + gini + hs, data=hc)
+
+#Show statistical summary
+summary(model)
+```
+
+```{r}
+#Getting a tidy summary of the coefficients
+coefSummary(model)
+```
+Interpretation: As we can see in the results above, gini and hs are significantly associated with hate crimes because their P-values (0.00044 and 0.00144) are well below 0.05 and their 95% confidence intervals do not include zero. Specifically, income inequality (gini) shows the strongest positive relationship with a point estimate of 56.524, followed by high school education (hs) at 27.746. Conversely, votes_trump is not significant (P=0.43468), as its interval (−6.119,2.676) crosses zero, indicating no clear effect.
+
+## 2. Assess the model assumptions: linearity, constant error variance, error normality. To what extent are they violated?
+
+### Assessing linearity
+```{r}
+pred = predict(model)
+resid = residuals(model)
+ggplot(hc, aes(pred, resid)) +
+  geom_point() +
+  geom_smooth() +
+  geom_abline(slope=0, intercept=0, col='gray') +
+  labs(x='Model prediction', y='Residuals', title='Assessing Linearity')
+
+```
+
+Interpretation: The linearity assumption is violated because the residuals exhibit a clear U-shaped non-linear trend. The smooth line deviates significantly from the zero reference line, suggesting that the model fails to capture the true functional form of the relationship. This indicates that the association between the predictors and hate crimes might be polynomial or require a transformation (such as a logarithmic scale) to better fit the data.
+
+### Assessing constant error variance (homoscedasticity)
+```{r}
+ggplot(hc, aes(x = pred, y = resid)) +  
+  geom_boxplot(mapping = aes(group = cut_width(pred, 0.5))) +
+  geom_abline(slope = 0, intercept = 0, col = 'gray') +
+  labs(x = 'Model prediction', y = 'Residuals', title = 'Assessing Constant Variance')
+```
+
+As we can see in the boxplot visualization, the constant error variance (homoscedasticity) assumption appears to be violated. The vertical spread of the residuals (the height of the boxes) varies notably across the different levels of model predictions, indicating that the model's precision is not uniform. This presence of heteroscedasticity suggests that the standard errors might be biased, which could affect the reliability of the P-values calculated earlier. Consequently, the model might require a variance-stabilizing transformation or robust standard errors.
+
+### Assessing error normality
+```{r}
+ggplot(hc) +
+  geom_qq(aes(sample = scale(resid))) +
+  geom_abline(slope = 1, intercept = 0, col = "red") +
+  labs(x = "Theoretical Quantiles", y = "Sample Quantiles", title = "Assessing Error Normality")
+```
+
+Interpretation: As we can see in the QQ-plot above, the error normality assumption is violated, particularly at the upper tail of the distribution. While the middle section of the residuals follows the diagonal reference line, the points at the extreme right deviate significantly upward. This indicates that the model's errors are "heavy-tailed," meaning that have much higher hate crime rates than predicted. Consequently, the distribution of residuals is not perfectly normal, which could slightly affect the precision of our confidence intervals.
+
+### Summary of model assumptions
+
+- Linearity: Violated (clear U-shaped pattern).
+- Homoscedasticity: Violated (unequal variance observed across the boxplots).
+- Normality: Mostly satisfied, though with concerning outliers in the tails of the distribution.
