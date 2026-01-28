@@ -1,0 +1,181 @@
+---
+title: "Seminar_1"
+author: "Ingrid Canelles Campas"
+format: pdf
+editor: visual
+---
+
+### Install and load data
+
+```{r}
+library(tidyverse)
+library(datasauRus)
+```
+
+### Have a look at the data
+
+```{r}
+datasaurus_dozen_wide
+data("datasaurus_dozen_wide")
+datasauRus::twelve_from_slant_wide
+```
+
+### Obtain info
+
+```{r}
+?datasaurus_dozen_wide
+```
+
+# Part 1
+
+```{r}
+summary(datasaurus_dozen_wide)
+glimpse(datasaurus_dozen_wide)
+```
+
+```{r}
+# Command + shift + m: %>% --> pipe operator
+datasaurus_dozen_wide %>% 
+  ggplot() + 
+  geom_point(mapping = aes(x = away_x, y = away_y))
+```
+
+## Tidying Data
+
+column = variable and row = observation
+
+```{r}
+df <- datasaurus_dozen_wide %>%
+  mutate(id = row_number()) %>% 
+  pivot_longer(cols = -id,
+               names_to = c("dataset","var_name"),
+               values_to = "value",
+               names_pattern = "^(.*)_(.*)$") %>% 
+  pivot_wider(names_from = var_name, values_from = value) %>% 
+  select(-id)
+```
+
+## Summary statistics
+
+```{r}
+# names of the dataset
+df %>% 
+  distinct(dataset)
+```
+
+```{r}
+dataset_list <- c("dino","star","bullseye","away")
+```
+
+```{r}
+df %>% 
+  filter(dataset == "dino") %>% 
+  summarise(mean_x = mean(x),
+            sd_x = sd(x))
+```
+
+```{r}
+df %>%  
+  filter(dataset %in% dataset_list) %>% 
+  group_by(dataset) %>% 
+  summarise(across(c(x,y), list(mean = mean, sd = sd)))
+```
+
+```{r}
+df %>%  
+  filter(dataset %in% dataset_list) %>% 
+  group_by(dataset) %>% 
+  summarise(across(c(x, y), list(mean = mean, sd = sd)),
+            slope = coef(lm(y ~ x))[2])
+```
+
+## Plotting
+
+```{r}
+df %>% 
+  filter(dataset %in% dataset_list) %>% 
+  ggplot() +
+  geom_point(aes(x, y)) +
+  facet_wrap(vars(dataset))
+```
+
+```{r}
+df %>% 
+  filter(dataset %in% dataset_list) %>% 
+  ggplot(aes(x, y, color = dataset)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  facet_wrap(vars(dataset))
+```
+
+# Part 2: The Titanic Dataset
+
+```{r}
+# use assignment side
+titanic <- read_csv("/Users/ingridcanelles/Documents/GitHub/statcomp/datasets/titanic.csv")
+```
+
+## Gender vs survival
+
+```{r}
+titanic = titanic %>% 
+  mutate(across(c(Survived, Pclass, Sex), as.factor))
+```
+
+```{r}
+titanic %>% 
+  ggplot() +
+  geom_bar(aes(y = Sex, fill = Survived), position = "dodge2") +
+  labs(title = "Survival Comparison: Male vs Female",
+       x = "Count of Passengers",
+       y = "Gender")
+```
+
+## Survival by gender and class
+
+```{r}
+titanic %>% 
+  ggplot() +
+  geom_bar(aes(y = Sex, fill = Survived), position = "dodge2") +
+  facet_wrap(~Pclass) + 
+  theme_minimal() +
+  labs(title = "Survival by Gender across Passenger Classes",
+       x = "Count of Passengers",
+       y = "Gender")
+```
+
+## Age distribution
+
+```{r}
+titanic %>% 
+  filter(!is.na(Age)) %>% 
+  ggplot(aes(x = Age, fill = Survived)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Age Distribution of Survivors vs Non-Survivors",
+       x = "Age (Years)",
+       y = "Density")
+```
+
+## Fare and survival
+
+```{r}
+titanic %>% 
+  ggplot(aes(x = Survived, y = Fare, fill = Survived)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  labs(title = "Survival Outcome based on Ticket Fare",
+       y = "Fare Price (Log Scale)",
+       x = "Survived")
+```
+
+## Interpretation
+
+-   Women were much more likely to survive than men.
+
+-   Passengers in higher classes showed higher survival rates.
+
+-   Higher ticket fares were associated with a greater chance of survival.
+
+-   Third class passengers, especially men, had the lowest survival probability.
+
+-   Overall, gender and social class strongly influenced survival.
