@@ -1,0 +1,88 @@
+---
+title: "Ingrid_Canelles"
+output: html_document
+date: "2026-01-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Load data:
+
+```{r}
+library(fivethirtyeight)
+library(ggplot2)
+sel= c('state_abbrev','avg_hatecrimes_per_100k_fbi','share_vote_trump','gini_index','share_pop_hs')
+hc= hate_crimes[,sel]
+names(hc)= c('state','hatecrimes_fbi','votes_trump','gini','hs')
+hc <- na.omit(hc)  #remove rows with missing valuesa.
+```
+
+### Discretize variables into 4 categories each:
+
+```{r}
+hc$ginic= cut(hc$gini, breaks=c(0,0.43,0.45,0.47,1))
+levels(hc$ginic)= c('Gini <= 0.43','0.43 < Gini <= 0.45','0.45 < Gini <= 0.47','Gini > 0.47')
+
+hc$hsc= cut(hc$hs, breaks=c(0,0.83,0.86,0.9,1))
+levels(hc$hsc)= c('hs <= 0.83', '0.83 < hs <= 0.86', '0.86 < hs <= 0.9', 'hs > 0.9')
+```
+
+## 1.Scatterplots
+
+### FBI-related crimes vs. Trump voters.
+
+```{r}
+ggplot(hc, aes(x = votes_trump, y = hatecrimes_fbi)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    x = "% votes for Trump",)
+```
+
+### FBI-related crimes vs. Gini index.
+
+```{r}
+ggplot(hc, aes(x = gini, y = hatecrimes_fbi)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    x = "Gini index",
+    y = "Avg. hate crimes per 100k (FBI)")
+```
+
+### FBI-related crimes vs. Population with high school degree.
+
+```{r}
+ggplot(hc, aes(x = hs, y = hatecrimes_fbi)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    x = "% population with high school degree",
+    y = "Avg. hate crimes per 100k (FBI)")
+```
+
+## 2.Scatter-plot of FBI-related crimes vs. Trump voters, with different panels (facets) for states in each of 4 categories for the Gini index:
+
+```{r}
+ggplot(hc, aes(x = votes_trump, y = hatecrimes_fbi)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ ginic) +
+  labs(
+    x = "% votes for Trump",
+    y = "Avg. hate crimes per 100k (FBI)")
+```
+
+## 3.Same as 2, now with panels for 4 categories in the % of high-school education:
+
+```{r}
+ggplot(hc, aes(x = votes_trump, y = hatecrimes_fbi)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ hsc) +
+  labs(
+    x = "% votes for Trump",
+    y = "Avg. hate crimes per 100k (FBI)")
+```
