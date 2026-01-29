@@ -1,29 +1,40 @@
 ---
 title: "Exercise_5"
-Subtitle: "Ingrid Canelles Campas"
+author: "Ingrid Canelles"
 output: html_document
 date: "2026-01-25"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+### Data preparation
 
+```{r}
 #Load libraries
 library(tidyverse)
 library(fivethirtyeight)
+library(ggpubr)
+```
 
+
+```{r}
 #Load routines
-source("code/routines.R")
+source("/Users/ingridcanelles/Documents/GitHub/statcomp/code/routines.R")
+```
 
+
+```{r}
 #Select and rename the needed variables, and remove Hawaii 
 hc= transmute(hate_crimes, state=state_abbrev, hatecrimes_fbi=avg_hatecrimes_per_100k_fbi, votes_trump=share_vote_trump, gini=gini_index, hs=share_pop_hs)
 hc= filter(hc, !is.na(hatecrimes_fbi)) #outcome must be non-missing
 ```
 
-## 1. Fit a linear regression for hatecrimes_fbi vs. votes_trump, gini, hs. Report the point estimate, 95% intervals and P-values for the 3 covariates. Which of them are significantly associated to hate crimes?
+## 1. Linear Regression
+Fit a linear regression for hatecrimes_fbi vs. votes_trump, gini, hs. Report the point estimate, 95% intervals and P-values for the 3 covariates. 
 
 ```{r}
-#Fitting the linear regression
+#Fitting the linear model
 model= lm(hatecrimes_fbi ~ votes_trump + gini + hs, data=hc)
 
 #Show statistical summary
@@ -34,9 +45,12 @@ summary(model)
 #Getting a tidy summary of the coefficients
 coefSummary(model)
 ```
-Interpretation: As we can see in the results above, gini and hs are significantly associated with hate crimes because their P-values (0.00044 and 0.00144) are well below 0.05 and their 95% confidence intervals do not include zero. Specifically, income inequality (gini) shows the strongest positive relationship with a point estimate of 56.524, followed by high school education (hs) at 27.746. Conversely, votes_trump is not significant (P=0.43468), as its interval (−6.119,2.676) crosses zero, indicating no clear effect.
 
-## 2. Assess the model assumptions: linearity, constant error variance, error normality. To what extent are they violated?
+### Interpretation
+As we can see in the results above, gini and hs are significantly associated with hate crimes because their P-values (0.00044 and 0.00144) are well below 0.05 and their 95% confidence intervals do not include zero. Specifically, income inequality (gini) shows the strongest positive relationship with a point estimate of 56.524, followed by high school education (hs) at 27.746. Conversely, votes_trump is not significant (P=0.43468), as its interval (−6.119,2.676) crosses zero, indicating no clear effect.
+
+## 2. Assessment of Model Assumptions
+Compute predictions and residuals to assess the assumption of linearity, constant error variance, error normality. To what extent are they violated?
 
 ### Assessing linearity
 ```{r}
@@ -50,9 +64,12 @@ ggplot(hc, aes(pred, resid)) +
 
 ```
 
-Interpretation: The linearity assumption is violated because the residuals exhibit a clear U-shaped non-linear trend. The smooth line deviates significantly from the zero reference line, suggesting that the model fails to capture the true functional form of the relationship. This indicates that the association between the predictors and hate crimes might be polynomial or require a transformation (such as a logarithmic scale) to better fit the data.
+#### Interpretation
 
-### Assessing constant error variance (homoscedasticity)
+The linearity assumption is violated because the residuals exhibit a clear U-shaped non-linear trend. The smooth line deviates significantly from the zero reference line, suggesting that the model fails to capture the true functional form of the relationship. This indicates that the association between the predictors and hate crimes might be polynomial or require a transformation (such as a logarithmic scale) to better fit the data.
+However, there is a distinct outlier with a very high positive residual suggesting the model does not fit this specific observation well.
+
+### Assessing Constant Error Variance (Homoscedasticity)
 ```{r}
 ggplot(hc, aes(x = pred, y = resid)) +  
   geom_boxplot(mapping = aes(group = cut_width(pred, 0.5))) +
@@ -60,9 +77,24 @@ ggplot(hc, aes(x = pred, y = resid)) +
   labs(x = 'Model prediction', y = 'Residuals', title = 'Assessing Constant Variance')
 ```
 
+#### Interpretation:
 As we can see in the boxplot visualization, the constant error variance (homoscedasticity) assumption appears to be violated. The vertical spread of the residuals (the height of the boxes) varies notably across the different levels of model predictions, indicating that the model's precision is not uniform. This presence of heteroscedasticity suggests that the standard errors might be biased, which could affect the reliability of the P-values calculated earlier. Consequently, the model might require a variance-stabilizing transformation or robust standard errors.
 
-### Assessing error normality
+### Assessing Error Normality
+To check if the error terms follow a normal distribution we are going to usse a histogram and a Q-Q plot
+
+```{r}
+# Histogram with normal density
+ggplot(hc, aes(x=resid)) +
+  geom_histogram(aes(y= after_stat(density)), bins=10, fill="gray", color="black") +
+  stat_overlay_normal_density(linetype = "dashed", color="red") +
+  labs(title="Histogram of Residuals", x='Residuals')
+
+```
+
+#### Interpretation
+The histogram is not perfectly bell-shaped; instead, it is right-skewed, with a long tail extending to the right. This indicates that although most errors are clustered around zero, there are a few states with unusually high hate crime rates that the model is failing to predict accurately and is underestimating.
+
 ```{r}
 ggplot(hc) +
   geom_qq(aes(sample = scale(resid))) +
@@ -70,7 +102,8 @@ ggplot(hc) +
   labs(x = "Theoretical Quantiles", y = "Sample Quantiles", title = "Assessing Error Normality")
 ```
 
-Interpretation: As we can see in the QQ-plot above, the error normality assumption is violated, particularly at the upper tail of the distribution. While the middle section of the residuals follows the diagonal reference line, the points at the extreme right deviate significantly upward. This indicates that the model's errors are "heavy-tailed," meaning that have much higher hate crime rates than predicted. Consequently, the distribution of residuals is not perfectly normal, which could slightly affect the precision of our confidence intervals.
+#### Interpretation
+As we can see in the QQ-plot above, the error normality assumption is violated, particularly at the upper tail of the distribution. While the middle section of the residuals follows the diagonal reference line, the points at the extreme right deviate significantly upward. This indicates that the model's errors are "heavy-tailed," meaning that have much higher hate crime rates than predicted. Consequently, the distribution of residuals is not perfectly normal, which could slightly affect the precision of our confidence intervals.
 
 ### Summary of model assumptions
 
