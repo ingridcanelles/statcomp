@@ -1,0 +1,183 @@
+---
+title: "Seminar 2"
+author: "Ingrid Canelles"
+format: pdf
+editor: visual
+---
+
+## Question 1
+
+```{r}
+#| warning: false
+#| 
+library(tidyverse)
+```
+
+```{r}
+data(diamonds)
+```
+
+```{r}
+glimpse(diamonds)
+```
+
+```{r}
+diamonds %>% 
+  ggplot (aes(price))+
+  geom_histogram()
+```
+
+```{r}
+# I want to select only the columns that are numeric
+diamonds %>% 
+  select(where(is.numeric)) %>% 
+  cor() %>% 
+  corrplot::corrplot(method="number")
+```
+
+-   variable with itself perfectly correlated
+
+-   carat is highly correlated with x,y,z –\> including both could be redundant
+
+-   For forecasting is not a problem to keep adding variables. For econometrics adding variables can adds multicolinearity
+
+    ## Question 2
+
+    ```{r}
+    #scatterplot between price and carat, add a linearfit, and nonlinearfit
+    diamonds %>% 
+      ggplot(aes(carat,price))+
+      geom_point()+
+      geom_smooth()+
+      geom_smooth(method="lm",se=FALSE, color="red")
+    ```
+
+When carat (weight) is big, model differs a lot of being a linear model.
+
+-   we can fit a quadratic model (when we have non linear relationship) by adding in the linear model a quadratic variable
+
+-   when i increase corat by 1%, price ingrease by
+
+## Question 3
+
+```{r}
+# transforming the model in logs
+diamonds %>% 
+  ggplot(aes(log(carat),log(price)))+
+  geom_point()+
+  geom_smooth()+
+  geom_smooth(method="lm",se=FALSE, color="red")
+```
+
+```{r}
+model1 = lm(log(price) ~ log(carat), data = diamonds)
+model1$coefficients
+model1[["coefficients"]]
+coefficients(model1)
+summary(model1)
+
+```
+
+```{r}
+model2 = lm(log(price) ~ log(carat) + x +y + z, data = diamonds)
+model2$coefficients
+model2[["coefficients"]]
+coefficients(model2)
+summary(model2)
+```
+
+```{r}
+diamonds %>% 
+  ggplot(aes(clarity,price))+
+  geom_boxplot()
+```
+
+-   clarity is an order factor
+
+```{r}
+diamonds %>% 
+  select(c(price,cut,color,clarity)) %>% 
+  GGally::ggbivariate(outcome="price")
+```
+
+```{r}
+diamonds %>% 
+  ggplot(aes(log(carat),log(price)))+
+  geom_point()+
+  geom_smooth(method="lm", se=FALSE)+
+  facet_wrap(vars(clarity))
+  
+```
+
+```{r}
+diamonds %>% 
+  ggplot(aes(log(carat),log(price)))+
+  geom_point(data=mutate(diamonds,clarity=NULL), color="lightgrey") +
+  geom_point()+
+  geom_smooth(method="lm", se=FALSE)+
+  facet_wrap(vars(clarity))
+```
+
+```{r}
+#generate all formulas
+vars = c("color", "cut", "clarity")
+interactions = map_chr(vars, \(x) str_c("carat:", x))
+vars = c(vars, interactions)
+
+#combinations
+combinations = map(0:6, \(x) combn(vars, x, simplify = FALSE)) %>%
+  unlist(recursive = FALSE)
+formulas = map_chr(combinations, \(x) paste(c("price ~ carat", x), collapse = ' + ' ))
+formulas
+```
+
+For each we estimate a model.
+
+```{r}
+models <- map(formulas, ~ lm(as.formula(.x), data = diamonds))
+```
+
+Adjust the model using r squared.
+
+```{r}
+model_fit <- tibble(
+  formula = formulas,
+  adj_r2 = map_dbl(models, ~ summary(.x)$adj.r.squared))
+```
+
+Select the best model. The higher the r squared.
+
+```{r}
+adj_r2 <- sapply(models, function(m) summary(m)$adj.r.squared)
+adj_r2
+```
+
+```{r}
+best_index <- which.max(adj_r2)
+best_model <- models[[best_index]]
+
+best_formula <- formulas[[best_index]]
+best_adj_r2 <- adj_r2[[best_index]]
+```
+
+```{r}
+best_index
+```
+
+```{r}
+best_model
+```
+
+```{r}
+best_formula
+```
+
+```{r}
+best_adj_r2
+```
+
+All possible linear models including `carat`, `color`, `cut`, `clarity`, and their interactions with `carat` were fitted and compared using the adjusted R².\
+The best-performing model included all main effects and all interactions with `carat`, achieving an adjusted R² of 0.933.\
+This indicates that the model explains a large proportion of the variability in diamond prices.\
+The inclusion of interaction terms suggests that the effect of carat on price depends on color, cut, and clarity.\
+Predicted prices closely match the observed values, indicating a strong overall model fit.
