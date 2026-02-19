@@ -1,0 +1,129 @@
+---
+title: "Exercise_7"
+author: "Ingrid Canelles"
+date: "2026-02-18"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load libraries
+library(tidyverse)
+library(openintro)
+library(modelr)
+```
+#### Fit the logistic model with interaction
+
+```{r}
+fit_int <- glm(spam ~ num_char * re_subj,
+               data = email,
+               family = binomial())
+
+summary(fit_int)
+
+```
+Interpretation of the logistic model with interaction:
+
+The number of characters ($\beta_1 = -0.063$, p < 0.001) has a negative and highly significant effect on spam probability, meaning that longer emails are less likely to be classified as spam. 
+
+The presence of “Re:” in the subject line ($\beta_2 = -2.640$, p < 0.001) is also strongly associated with a lower probability of spam.
+
+The interaction term between the number of characters and the presence of “Re:” ($\beta_3 = -0.077$, p = 0.421) is not statistically significant. This indicates that there is no strong evidence that the effect of email length differs depending on whether the subject contains “Re:”.
+
+Overall, the main effects are important predictors of spam, but the interaction does not meaningfully improve the model.
+
+#### Derive the effect of num_char in each group
+
+```{r}
+b <- coef(fit_int)
+
+effect_re0 <- b["num_char"]
+effect_re1 <- b["num_char"] + b["num_char:re_subj1"]
+
+effect_re0
+effect_re1
+
+```
+Interpretation of the effect of num_char in each group:
+
+When $re\_subj = 0$, the effect of $num\_char$ on the log-odds of spam is $\beta_1 = -0.063$.
+
+When $re\_subj = 1$, the effect becomes $\beta_1 + \beta_3 = -0.140$.
+
+Thus, the negative effect of the number of characters is stronger when “Re:” is present in the subject line. However, this difference is not statistically significant.
+
+#### Odds ratio for +10 characters
+
+```{r}
+OR_re0 <- exp(10 * effect_re0)
+OR_re1 <- exp(10 * effect_re1)
+
+OR_re0
+OR_re1
+
+```
+Interpretation of the odds ratios for +10 characters:
+
+For emails without “Re:” ($re\_subj = 0$), increasing the number of characters by 10 multiplies the odds of being spam by 
+$\exp(10\beta_1) = 0.53$, corresponding to a reduction of about 47% in the odds of spam.
+
+For emails with “Re:” ($re\_subj = 1$), a 10-character increase multiplies the odds by 
+$\exp(10(\beta_1 + \beta_3)) = 0.25$, implying a reduction of approximately 75% in the odds of spam.
+
+#### Is the interaction statistically significant?
+```{r}
+summary(fit_int)$coef["num_char:re_subj1", ]
+
+```
+
+
+```{r}
+# Or more formally via Likelihood Ratio Test:
+fit_no <- glm(spam ~ num_char + re_subj,
+              data = email,
+              family = binomial())
+
+anova(fit_no, fit_int, test = "Chisq")
+
+```
+Interpretation of the interaction significance:
+
+The interaction term between num_char and re_subj is not statistically significant (p = 0.421). This indicates that there is no strong evidence that the effect of the number of characters on spam probability differs depending on whether the subject contains “Re:”.
+The Likelihood Ratio Test confirms this result. Comparing the model with and without interaction yields a p-value of 0.359, which is well above 0.05. Therefore, adding the interaction does not significantly improve model fit.
+Overall, the simpler model without interaction is sufficient.
+
+#### Plot predicted spam probabilities
+
+```{r}
+# Create a proper prediction grid
+grid <- data_grid(email,
+                  num_char = seq(min(email$num_char),
+                                 max(email$num_char),
+                                 length.out = 200),
+                  re_subj = levels(email$re_subj))
+
+# Obtain predicted probabilities
+grid$pred_int <- predict(fit_int,
+                         newdata = grid,
+                         type = "response")
+# Plot predicted curves
+ggplot(grid, aes(x = num_char, y = pred_int, color = re_subj)) +
+  geom_line() +
+  labs(x = "Number of characters",
+       y = "Predicted probability of spam",
+       color = "Subject contains 'Re:'") +
+  theme_minimal()
+
+```
+Interpretation of the predicted probability curves:
+
+The predicted probability of spam decreases sharply as the number of characters increases, confirming the strong negative effect of email length. Emails without “Re:” in the subject (re_subj = 0) consistently have a higher predicted probability of spam compared to those with “Re:”.
+Although the slope appears slightly steeper when re_subj = 1, the curves are fairly similar overall, which aligns with the previous statistical results indicating that the interaction term is not significant.
+Therefore, while email length strongly reduces spam probability and “Re:” substantially lowers baseline spam risk, the difference in slopes between the two groups is not meaningful.
+
+
+
+
